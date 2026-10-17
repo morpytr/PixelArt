@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PixelArt</title>
+<link rel="icon" type="image/png" href="../icon.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="logo-svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true">
+          <rect x="4" y="4" width="56" height="56" rx="10" fill="#1a1a1a" stroke="#333"/>
+          <g>
+            <rect x="14" y="14" width="10" height="10" fill="#e53935"/>
+            <rect x="27" y="14" width="10" height="10" fill="#555"/>
+            <rect x="40" y="14" width="10" height="10" fill="#333"/>
+            <rect x="14" y="27" width="10" height="10" fill="#555"/>
+            <rect x="27" y="27" width="10" height="10" fill="#e53935"/>
+            <rect x="40" y="27" width="10" height="10" fill="#555"/>
+            <rect x="14" y="40" width="10" height="10" fill="#333"/>
+            <rect x="27" y="40" width="10" height="10" fill="#555"/>
+            <rect x="40" y="40" width="10" height="10" fill="#e53935"/>
+          </g>
+        </svg>
+        <h1>PixelArt</h1>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Input: UUID or Upload PNG -->
+      <section class="landing">
+        <div class="input-wrap">
+          <div class="input-bar">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="1" width="22" height="22" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </span>
+            <input id="uuidInput" type="text" placeholder="Enter Minecraft UUID..." autocomplete="off" spellcheck="false" />
+            <button id="loadBtn" class="load-btn" aria-label="Load">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+              Load
+            </button>
+          </div>
+          <div class="input-actions">
+            <button id="uploadBtn" class="action-btn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><rect x="3" y="15" width="18" height="6" rx="2"/></svg>
+              Upload PNG
+            </button>
+            <input id="fileInput" type="file" accept="image/png,image/*" hidden />
+          </div>
+          <div id="landingStatus" class="status"></div>
+        </div>
+      </section>
+
+      <!-- Workspace -->
+      <section id="workspace" class="workspace hidden">
+        <div class="ws-header">
+          <button id="backBtn" class="btn ghost">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+          <h2 id="skinName">—</h2>
+          <span id="skinUuid" class="mono small"></span>
+        </div>
+
+        <div class="previews-row">
+          <div class="preview-box">
+            <h3>Source</h3>
+            <canvas id="headCanvas" width="160" height="160"></canvas>
+          </div>
+          <div class="preview-box">
+            <h3>Selected Size</h3>
+            <canvas id="sizePreviewCanvas" width="160" height="160"></canvas>
+          </div>
+          <div class="preview-box">
+            <h3>Pixel Grid</h3>
+            <canvas id="gridCanvas" width="160" height="160"></canvas>
+          </div>
+        </div>
+
+        <div class="ws-grid">
+          <div class="card">
+            <h2>Settings</h2>
+            <div class="field">
+              <label>Size (px)</label>
+              <div id="sizeButtons" class="size-buttons"></div>
+              <div class="row gap wrap center" style="margin-top:8px">
+                <input id="customSize" type="number" min="2" max="32" placeholder="Custom (e.g. 9)" />
+                <button id="applyCustomSize" class="btn ghost">Apply</button>
+              </div>
+              <div class="small muted">Recommended: 8x8. Max 12x12 recommended.</div>
+            </div>
+            <div class="field">
+              <label>Color format</label>
+              <select id="colorFormat">
+                <option value="hashamp">&#RRGGBB (Skript/Plugin)</option>
+                <option value="angle">&lt;#RRGGBB&gt; (Skript hex)</option>
+                <option value="section">§x§R§R§G§G§B§B (Minecraft)</option>
+                <option value="ampx">&amp;x&amp;R&amp;R... (legacy)</option>
+                <option value="named">Minecraft 16 colors (nearest)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Block character</label>
+              <div class="char-picker">
+                <select id="blockChar">
+                  <option value="█">█ (full block)</option>
+                  <option value="▓">▓ (dark shade)</option>
+                  <option value="▒">▒ (medium shade)</option>
+                  <option value="░">░ (light shade)</option>
+                  <option value="#"># (hash)</option>
+                  <option value="@">@ (at)</option>
+                </select>
+                <div class="block-preview" id="blockPreview">█</div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Output template</label>
+              <select id="template">
+                <option value="skript">Skript command</option>
+                <option value="raw">Colored lines only</option>
+                <option value="messages">send messages</option>
+                <option value="java">Java (ImageMessage style)</option>
+                <option value="json">JSON</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Command name</label>
+              <input id="cmdName" type="text" value="pixelart" />
+            </div>
+            <div class="field">
+              <label>Options</label>
+              <div class="toggles col">
+                <label class="toggle"><input type="checkbox" id="includeHat" /> Include hat (overlay)</label>
+                <label class="toggle"><input type="checkbox" id="useNearest" /> Nearest-neighbor (sharp)</label>
+                <label class="toggle"><input type="checkbox" id="compact" checked /> Compact (group same colors)</label>
+                <label class="toggle"><input type="checkbox" id="transparentSpace" checked /> Transparent to space</label>
+                <label class="toggle"><input type="checkbox" id="addReset" checked /> Line reset</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row between">
+              <h2>Output</h2>
+              <div class="row gap wrap">
+                <button id="copyBtn" class="btn ghost">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy
+                </button>
+                <button id="downloadBtn" class="btn ghost">.sk</button>
+                <button id="downloadTxtBtn" class="btn ghost">.txt</button>
+                <button id="downloadSvgBtn" class="btn ghost">SVG</button>
+              </div>
+            </div>
+            <textarea id="output" readonly spellcheck="false" title="Click to copy"></textarea>
+            <div class="small muted" id="outputInfo"></div>
+          </div>
+
+          <div class="card">
+            <h2>SVG Preview</h2>
+            <div id="svgPreview" class="svg-preview"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Crop / pixel editor -->
+      <div id="cropModal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-box">
+          <h2>Pixel Editor</h2>
+          <div class="editor-toolbar">
+            <label class="small">Brush <input type="color" id="brushColor" value="#ff0000" /></label>
+            <button id="brushToggle" class="btn ghost">Transparent</button>
+            <button id="autoBg" class="btn ghost">Auto remove BG</button>
+          </div>
+          <div class="crop-stage" id="cropStage">
+            <canvas id="editorCanvas"></canvas>
+            <div id="cropBox" class="crop-box"><div class="crop-handle"></div></div>
+          </div>
+          <div class="row gap wrap center" style="margin-top:12px">
+            <button id="cropConfirm" class="btn primary">Confirm</button>
+            <button id="cropCancel" class="btn ghost">Cancel</button>
+            <span class="small muted">Drag square to select. Click pixels to paint.</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <a href="https://github.com/morpytr" target="_blank" rel="noopener noreferrer" class="gh-link">
+        GitHub
+      </a>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "name": "pixelart",
+  "version": "1.0.0",
+  "description": "Minecraft skin pixel art generator (PixelArt)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron44 .",
+    "dev": "electron44 .",
+    "package": "electron-builder"
+  },
+  "author": "morpytr",
+  "license": "MIT",
+  "build": {
+    "appId": "com.morpytr.pixelart",
+    "productName": "PixelArt",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "icon.png"
+    ],
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "icon.png"
+    },
+    "win": {
+      "target": ["nsis", "zip"],
+      "icon": "icon.png"
+    },
+    "linux": {
+      "target": ["AppImage", "deb", "rpm"],
+      "icon": "icon.png"
+    }
+  }
+}
